@@ -1,0 +1,38 @@
+{
+  "name": "n8n-nodes-portio",
+  "version": "0.1.1",
+  "description": "Port.io Agent Invoke & General AI interactions for n8n",
+  "keywords": [
+    "n8n-community-node-package"
+  ],
+  "license": "MIT",
+  "author": "Port (Nathan Roys)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "icons"
+  ],
+  "n8n": {
+    "nodes": [
+      "dist/nodes/PortIo/PortIo.node.js"
+    ],
+    "credentials": [
+      "dist/credentials/PortIoApi.credentials.js"
+    ]
+  },
+  "scripts": {
+    "build": "tsc",
+    "postbuild": "node ./scripts/copy-svg.js",
+    "dev": "tsc -w",
+    "prepare": "pnpm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^18.19.0",
+    "n8n-workflow": "^1.40.0",
+    "typescript": "^5.6.3"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "^1.0.0"
+  }
+}
