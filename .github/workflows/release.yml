@@ -75,10 +75,11 @@ jobs:
           echo "Checking for .npmrc file..."
           cat ~/.npmrc 2>/dev/null || echo "ERROR: No .npmrc found"
           echo "Verifying npm can access registry..."
-          npm ping --registry=https://registry.npmjs.org || echo "ERROR: Ping to registry failed. Will attempt to deploy anyway."
+          npm ping --registry=https://registry.npmjs.org || echo "ERROR: Ping to registry failed, will attempt to deploy anyway."
 
       - name: Run Semantic Release
         working-directory: ./dist
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_CONFIG_PROVENANCE=true
