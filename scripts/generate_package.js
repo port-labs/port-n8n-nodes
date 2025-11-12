@@ -39,7 +39,7 @@ const copyDirRecursive = (from, to, filter = () => true) => {
 ensureDir(dist);
 
 // 2) Copy top-level docs if present
-['README.md', 'LICENSE', 'CHANGELOG.md'].forEach((f) => {
+['README.md', 'LICENSE', 'CHANGELOG.md', '.npmignore'].forEach((f) => {
     const src = path.join(root, f);
     if (fs.existsSync(src)) copyFile(src, path.join(dist, f));
 });
@@ -94,7 +94,18 @@ const distPkg = {
     // Only keep runtime deps/peers that consumers must have:
     peerDependencies: pkg.peerDependencies || {},
     dependencies: pkg.dependencies || {},
-    files: ['.']
+    files: [
+        "credentials/**/*.js",
+        "credentials/**/*.d.ts",
+        "nodes/**/*.js",
+        "nodes/**/*.d.ts",
+        "nodes/PortIo/port.svg",
+        "index.js",
+        "index.d.ts",
+        "LICENSE",
+        "README.md",
+        "package.json"
+    ]
 };
 
 fs.writeFileSync(path.join(dist, 'package.json'), JSON.stringify(distPkg, null, 2) + '\n');
