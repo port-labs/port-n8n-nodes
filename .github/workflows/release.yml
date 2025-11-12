@@ -35,7 +35,7 @@ jobs:
         with:
           node-version: 22.14.0
           registry-url: 'https://registry.npmjs.org'
-
+          always-auth: true
       - run: corepack enable
       - run: corepack prepare pnpm@10 --activate
 
