@@ -67,7 +67,10 @@ jobs:
         working-directory: ./dist
         run: pnpm run build
 
-      - name: Verify npm OIDC configuration
+      - name: Upgrade npm (needs >= 11.5.1)
+        run: npm i -g npm@latest
+
+      - name: Verify npm OIDC co§nfiguration
         working-directory: ./dist
         run: |
           echo "Checking npm registry configuration..."
@@ -79,7 +82,7 @@ jobs:
 
       - name: Run Semantic Release
         working-directory: ./dist
-        run: npx semantic-release
+        run: pnpm semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
