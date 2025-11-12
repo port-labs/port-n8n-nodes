@@ -1,127 +1,183 @@
-# n8n-nodes-portio
+# 🧩 @port-labs/n8n-nodes-portio-experimental
 
-Port.io n8n nodes, for interacting with Port through n8n. As of **November 2025** the focus is highly on supporting AI interactions (as opposed to other REST calls). As the project matures the number of node types may grow as we create an easy way for customers of n8n and Port to create workflows that bring together multiple tools.
+> **Port.io** n8n custom nodes for interacting with [Port](https://www.port.io/) via n8n workflows.
 
-## Installing on n8n
+As of **November 2025**, the focus of this package is on **AI interactions** through Port’s AI APIs. Future releases will expand to additional REST integrations and workflow automations, enabling n8n and Port users to connect multiple tools seamlessly. **This is an experimental package, no support can be provided
+in relation to your use of this package, if you've found a bug or need a feature currently not supported, open a GitHub issue**,
 
-### Installation Pre-requisites
+---
 
-- `pnmp` intalled
-- A working n8n instance (if you don't have this, there's a super simple guide using docker compose [here](https://medium.com/@learning.by.playing.2023/getting-started-n8n-with-dockercompose-eb602aaed5c0))
+## 🚀 Installation
 
-### Cloning
+### Option 1 — Install via npm (recommended)
 
-- Clone this repository in to $n8n_HOME/custom
-- Create the folder if it doesn't exist, if using the guide suggested you'd do `mkdir -p ./n8n-data/custom && cd ./n8n-data/custom` and then `git clone` this repo
-
-### Installing and building
-
-Next we'll installed the required dependencies and compile the Typescript so it can be used by n8n.
+You can install the package directly from npm:
 
 ```bash
-pnpm install
-pnpm build
+npm install @port-labs/n8n-nodes-portio-experimental
 ```
 
-If all was successful you'll now see a `dist` directory.
+or using **pnpm**:
 
-## Quick start
-
-### Adding a node
-
-1. On your running n8n instance create a new workflow.  
-
-   ![Create workflow](docs/images/adding_node/1_create_workflow.png)
-
-2. For testing purposes set the trigger to "Trigger Manually" and you'll be able to trigger by clicking.  
-
-   ![Trigger workflow](docs/images/adding_node/2_trigger.png)
-
-3. On the left hand side of the screen click the plus (+) button to add a new node, search for `port`.  
-
-   ![Search for port](docs/images/adding_node/3_search.png)
-
-4. Click the Port.io search result and select "General Purpose AI Interaction" (for ease of testing), it will pop up, close the popup and get back to your workflow.  
-
-   ![Select node](docs/images/adding_node/4_general.png)
-
-5. Connect your trigger with your AI node by dragging from the + icon on the trigger to the left side of the AI node.  
-
-   ![Connect nodes](docs/images/adding_node/5_connect.png)
-
-:partying_face: You've deployed your first Port n8n node! 🥳
-
-### Adding your account
-
-It's possible to store multiple account credentials in n8n for use with the Port nodes, but we'll just start with one.
-
-#### Account Pre-requisites
-
-It's possible to store multiple account credentials in n8n for use with the Port nodes, but we'll just start with one.
-
-- A working Port.io account with AI features enabled
-- Access to credentials
-
-1. Double click your Port AI node and at the top you'll see a dropdown named "Credential to connect with", click this and then click "Create new credential".  
-
-   ![Creating new credential](docs/images/adding_credentials/1_create.png)
-
-2. Grab your `client id` and `client secret` from Port ([see here](https://docs.port.io/build-your-software-catalog/custom-integration/api/) if you're not sure how to do that) and enter it in to n8n, finally click "Save".  
-
-   > [!NOTE]  
-   > For now the Port n8n nodes do not support JWT authentication, it is not really suitable for long-term storage of credentials, whereas Oauth credentials are.
-
-   ![Saving credentials](docs/images/adding_credentials/2_save.png)
-
-### (Finally) Running the node
-
-#### Pre-requisites for running the nodes
-
-- Manual trigger node created and connected to Port node
-- Port credentials saved in node
-- AI must be enabled on the Port account
-
-1. Double click your AI node and make sure the parameters match the below (feel free to change the user prompt if you like).  
-
-   ![Adding parameters](docs/images/first_prompt/1_params.png)
-
-2. Exit the node config screen, on the left click, on your trigger node click "Execute flow" and if successful you'll see a tick on your Port node, double click it to review the response. If everything went according to plan you should see a response to your prompt in the output which you can use in later nodes.  
-
-   ![Results](docs/images/first_prompt/2_result.png)
-
-🥳 You're now an AI expert! 🥳
-
-## Implemented paths
+```bash
+pnpm add @port-labs/n8n-nodes-portio-experimental
+```
 
 > [!NOTE]  
-> As of November 2025 the only supported prompts are AI prompts, please open issues and pull requests to add more n8n<->Port interactions.
+> When installed this way, the nodes will be available in your n8n instance once you configure n8n to load community nodes. To enable this you must set the environment variable `N8N_COMMUNITY_PACKAGES_ENABLED=true` and install the npm packages in N8N_HOME.
 
-| Method | Path | Purpose | Path Params (required) | Body – **required** | Body – optional / defaults | Notes & Allowed Values | Success Response |
+---
+
+### Option 2 — Local installation (development or custom build)
+
+#### Prerequisites
+
+- 🧱 A working **n8n** instance (see [this quick-start guide](https://medium.com/@learning.by.playing.2023/getting-started-n8n-with-dockercompose-eb602aaed5c0) for setup via Docker Compose)
+- 📦 `pnpm` installed globally (`npm install -g pnpm`)
+
+#### Steps
+
+1. Clone this repository inside your n8n custom nodes directory:
+
+   ```bash
+   mkdir -p ./n8n-data/custom
+   cd ./n8n-data/custom
+   git clone https://github.com/port-labs/n8n-nodes-portio-experimental.git
+   cd n8n-nodes-portio-experimental
+   ```
+
+2. Install dependencies and build the TypeScript source:
+
+   ```bash
+   pnpm install
+   pnpm build
+   ```
+
+3. If the build completes successfully, you’ll see a new `dist` directory containing the compiled nodes.
+
+---
+
+## 🧭 Quick Start
+
+### Adding a Port node in n8n
+
+1. Create a new workflow in your running n8n instance.  
+   ![Create workflow](docs/images/adding_node/1_create_workflow.png)
+
+2. Set the trigger to **“Manual Trigger”** so you can execute it by clicking.  
+   ![Trigger workflow](docs/images/adding_node/2_trigger.png)
+
+3. Add a new node (`+` button) and search for `port`.  
+   ![Search for port](docs/images/adding_node/3_search.png)
+
+4. Select the **Port.io** node and choose **“General Purpose AI Interaction”**.  
+   ![Select node](docs/images/adding_node/4_general.png)
+
+5. Connect the trigger node to the Port node.  
+   ![Connect nodes](docs/images/adding_node/5_connect.png)
+
+🎉 You’ve just deployed your first Port n8n node!
+
+---
+
+## 🔐 Adding Your Port Account
+
+You can store multiple Port credentials in n8n, but we’ll start with one.
+
+### Requirements
+
+- A **Port.io** account with **AI features enabled**
+- Your **Client ID** and **Client Secret** (see [Port API guide](https://docs.port.io/build-your-software-catalog/custom-integration/api/))
+
+### Steps
+
+1. Double-click your Port node.  
+2. Under **“Credential to connect with”**, choose “Create new credential.”  
+   ![Create credential](docs/images/adding_credentials/1_create.png)
+3. Enter your Port `client_id` and `client_secret`, then click **Save**.  
+   ![Save credential](docs/images/adding_credentials/2_save.png)
+
+> [!NOTE]  
+> JWT authentication is currently not supported because it’s unsuitable for long-term credential storage. OAuth2 credentials are the recommended method.
+
+---
+
+## 🧠 Running the Node
+
+Before execution, ensure:
+
+- You have a **Manual Trigger** connected to a **Port node**  
+- Credentials are saved  
+- Your Port account has **AI features enabled**
+
+Then:
+
+1. Open your AI node and configure the parameters (for example, set a user prompt).  
+   ![Parameters](docs/images/first_prompt/1_params.png)
+
+2. Execute the workflow manually and inspect the node output.  
+   ![Result](docs/images/first_prompt/2_result.png)
+
+✅ If successful, you’ll see an AI response from Port ready to be passed to subsequent nodes.
+
+---
+
+## ⚙️ API Endpoints Implemented
+
+> [!NOTE]  
+> As of November 2025, only **AI prompt** endpoints are supported. Contributions for additional API paths are welcome.
+
+| Method | Path | Purpose | Path Params | Body (required) | Optional Params | Notes | Success Response |
 |---|---|---|---|---|---|---|---|
-| `POST` | `/v1/agent/:agentIdentifier/invoke` | Invoke a specific agent | `agentIdentifier` (string) | — | `context` (object), `prompt` (string), `labels` (object), `provider` (string), `model` (string) | **provider**: `openai` \| `azure-openai` \| `anthropic` \| `bedrock` \| `port` • **model**: `gpt-5` \| `claude-sonnet-4-20250514` | JSON result from agent invocation |
-| `POST` | `/v1/ai/invoke` | General-purpose AI interaction | — | `invocation_identifier` (string), `userPrompt` (string), `tools` (string[]) | `labels` (object), `provider` (string), `model` (string), `systemPrompt` (string, default `""`), `executionMode` (string, default `Approval Required`) | **provider**: `openai` \| `azure-openai` \| `anthropic` \| `bedrock` \| `port` • **model**: `gpt-5` \| `claude-sonnet-4-20250514` • **executionMode**: `Automatic` \| `Approval Required` | JSON result for the invocation request |
-| `GET` | `/v1/ai/invoke/:invocation_identifier` | Get an invocation’s result | `invocation_identifier` (string) | — | — | — | `{ "ok": boolean, "result": object }` |
+| `POST` | `/v1/agent/:agentIdentifier/invoke` | Invoke a specific agent | `agentIdentifier` | — | `context`, `prompt`, `labels`, `provider`, `model` | Providers: `openai` \| `azure-openai` \| `anthropic` \| `bedrock` \| `port` <br> Models: `gpt-5` \| `claude-sonnet-4-20250514` | JSON agent result |
+| `POST` | `/v1/ai/invoke` | General-purpose AI interaction | — | `invocation_identifier`, `userPrompt`, `tools` | `labels`, `provider`, `model`, `systemPrompt`, `executionMode` | Execution mode: `Automatic` \| `Approval Required` | JSON result |
+| `GET` | `/v1/ai/invoke/:invocation_identifier` | Fetch invocation result | `invocation_identifier` | — | — | — | `{ ok: boolean, result: object }` |
 
-## Known issues and todo list
+---
 
-### Known issues
+## 🤝 Contributing
 
-- Tool names are not verified as valid
-- Model provider and model names are not checked to see if they are supported
-- AI requests only support streaming the full event before moving on, there is no async option
-- The response contains superfluous data, this is due to the payload being modified so the user can retreive the full execution result, not just an array of tokens
-- The Port search result does not use the Port.io icon (this is a known bug when adding via /custom, it will fix itself when deployed as an npm package)
+Contributions are welcome!
 
-### TODO's
+1. Fork the repo  
+2. Create a new branch (`feat/awesome-thing`)  
+3. Make your changes  
+4. Submit a PR with a clear description of your update  
 
-- All input parameters should be checked against the API spec to ensure validity before calling
-- Allow returning just the `invocation_identifier` and completing the rest of the call async (is this useful given n8n's very synchronous nature??)
-- Clean up the API response, remove extra newlines, add line-by-line result to metadata if it's needed
-- Submit to Port Community Hub
-- Become verified on the Port Community Hub so our nodes appear without users having to install them
-- Create build / publish pipeline for npm package
-  - Use GitHub actions
-  - Scan dependencies for vulnerabilities
-  - Semantic version each release and publish to npm
-- Use documentation generator to create docs if complexity of the tool reaches a threshold where manual management isn't feasible
-- **Once approved**: Create marketing material to announce availability and a simple install guide / script
+Please include tests and examples when possible.
+
+---
+
+## 🪪 License
+
+MIT © [Port Labs](https://www.port.io)
+
+---
+
+## 📦 Example Usage (code)
+
+```javascript
+// Example: Calling a Port AI node programmatically via n8n API
+
+const axios = require('axios');
+
+const res = await axios.post('https://n8n.local/api/v1/workflows/1/execute', {
+  userPrompt: 'Summarize this README for me!',
+  provider: 'openai',
+  model: 'gpt-5'
+});
+
+console.log(res.data);
+```
+
+---
+
+## 🏷️ Metadata
+
+| Field | Value |
+|---|---|
+| **Package name** | `@port-labs/n8n-nodes-portio-experimental` |
+| **Version** | `0.0.0` (experimental release) |
+| **Node type** | Custom n8n nodes |
+| **Focus** | Port AI integrations |
+| **Status** | Experimental / early access |
