@@ -1,115 +1,53 @@
 {
-  "name": "@port-labs/n8n-nodes-portio-experimental",
-  "version": "0.0.1-alpha.0",
-  "description": "EXPERIMENTAL: n8n nodes for Port.io",
-  "keywords": [
-    "n8n-community-node-package",
-    "port.io",
-    "port",
-    "ai",
-    "agent"
-  ],
-  "license": "MIT",
-  "homepage": "https://www.port.io/",
-  "author": {
-    "name": "Port"
-  },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "repository": {
-		"type": "git",
-		"url": "git+https://github.com/port-labs/port-n8n-nodes.git"
+	"name": "n8n-nodes-port-api-ai",
+	"version": "0.0.1-alpha.0",
+	"description": "EXPERIMENTAL: n8n nodes for Port.io",
+	"license": "MIT",
+	"homepage": "https://www.port.io/",
+	"keywords": [
+		"n8n-community-node-package",
+		"port.io",
+		"port",
+		"ai",
+		"agent"
+	],
+	"author": {
+		"name": "Port"
 	},
-  "n8n": {
-    "n8nNodesApiVersion": 1,
-    "nodes": [
-      "dist/nodes/PortIo/PortIo.node.js"
-    ],
-    "credentials": [
-      "dist/credentials/PortIoApi.credentials.js"
-    ]
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/",
-    "access": "public",
-    "provenance": true
-  },
-  "scripts": {
-    "build": "tsc",
-    "postbuild": "bash ./scripts/postbuild.sh",
-    "dev": "tsc -w",
-    "format": "pnpm prettier src --write",
-    "lint": "eslint src package.json",
-		"lintfix": "eslint src package.json --fix"
-  },
-  "devDependencies": {
-    "@semantic-release/git": "^10.0.1",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/github": "^12.0.1",
-    "@semantic-release/npm": "^13.1.0",
-    "conventional-changelog-conventionalcommits": "^9.1.0",
-    "@typescript-eslint/parser": "~8.36",
-    "@types/node": "^18.19.0",
-    "semantic-release": "^25.0.1",
-    "typescript": "^5.6.3",
-		"eslint": "^8.57.1",
-		"eslint-plugin-n8n-nodes-base": "^1.11.0",
-    "prettier": "^3.6.2"
-  },
-  "peerDependencies": {
-    "n8n-workflow": "*"
-  },
-  "release": {
-    "branches": [
-      {
-        "name": "alpha",
-        "prerelease": "alpha"
-      },
-      "main"
-    ],
-    "plugins": [
-      [
-        "@semantic-release/commit-analyzer",
-        {
-          "preset": "conventionalcommits",
-          "releaseRules": [
-            { "type": "feat", "release": "minor" },
-            { "type": "fix", "release": "patch" },
-            { "type": "perf", "release": "patch" },
-            { "breaking": true, "release": "major" }
-          ]
-        }
-      ],
-      "@semantic-release/release-notes-generator",
-      [
-        "@semantic-release/changelog",
-        {
-          "changelogFile": "CHANGELOG.md"
-        }
-      ],
-      [
-        "@semantic-release/npm",
-        {
-          "npmPublish": true,
-          "pkgRoot": "dist"
-        }
-      ],
-      [
-        "@semantic-release/github",
-        {
-          "assets": [
-            {
-              "path": "n8n-nodes-portio-dist.zip",
-              "label": "Distribution"
-            }
-          ],
-          "successComment": false,
-          "releasedLabels": false
-        }
-      ]
-    ]
-  }
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/port-labs/port-n8n-nodes.git"
+	},
+	"scripts": {
+		"build": "n8n-node build && rimraf dist/docs",
+		"build:watch": "tsc --watch",
+		"dev": "N8N_PORT=5680 N8N_SECURE_COOKIE=false n8n-node dev",
+		"lint": "n8n-node lint",
+		"lint:fix": "n8n-node lint --fix",
+		"prerelease": "node ../scripts/pre-release.js"
+	},
+	"files": [
+		"dist"
+	],
+	"n8n": {
+		"n8nNodesApiVersion": 1,
+		"strict": true,
+		"credentials": [
+			"dist/credentials/PortApi.credentials.js"
+		],
+		"nodes": [
+			"dist/nodes/PortApiAI/PortApiAi.node.js"
+		]
+	},
+	"devDependencies": {
+		"@n8n/node-cli": "*",
+		"eslint": "9.32.0",
+		"prettier": "3.6.2",
+		"release-it": "^19.0.4",
+		"rimraf": "^6.1.0",
+		"typescript": "5.9.2"
+	},
+	"peerDependencies": {
+		"n8n-workflow": "*"
+	}
 }

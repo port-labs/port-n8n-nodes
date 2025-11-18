@@ -1,0 +1,19 @@
+{
+	"node": "n8n-nodes-port-api-ai",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Do something in an app"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://docs.port.io/api-reference/"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://docs.port.io/"
+			}
+		]
+	}
+}
+
