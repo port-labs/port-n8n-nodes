@@ -38,7 +38,7 @@ export const generalInvokeDescription: INodeProperties[] = [
 		type: 'string',
 		default: '["^(list|get|search|track|describe|run_*)_.*"]',
 		required: true,
-		description: 'Array of tool names as JSON string (e.g., ["tool1", "tool2"])',
+		description: 'Array of tool names as JSON string. Supports regex patterns (e.g., ["tool1", "tool2"] or ["^(list|get|search|track|describe|run_*)_.*"]). The default matches multiple tool names using a regex.',
 		displayOptions: {
 			show: showOnlyForGeneralInvoke,
 		},
