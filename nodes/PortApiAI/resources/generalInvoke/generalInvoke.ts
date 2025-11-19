@@ -10,7 +10,7 @@ import {
 } from '../../shared/utils';
 
 export const generalInvokeOperation = {
-	name: 'General-Purpose AI Interactions',
+	name: 'Invoke an AI Interaction',
 	value: 'generalInvoke',
 	description: 'POST /v1/ai/invoke',
 	action: 'Invoke a General-Purpose AI Interaction',
