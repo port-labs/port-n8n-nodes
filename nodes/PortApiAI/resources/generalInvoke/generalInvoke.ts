@@ -68,7 +68,7 @@ export const generalInvokeDescription: INodeProperties[] = [
 		displayName: 'Model',
 		name: 'generalModel',
 		type: 'options',
-		default: 'gpt-5',
+		default: 'claude-sonnet-4-20250514',
 		description: 'Optional model',
 		displayOptions: {
 			show: showOnlyForGeneralInvoke,
