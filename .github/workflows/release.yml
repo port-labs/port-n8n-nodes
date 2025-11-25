@@ -80,6 +80,6 @@ jobs:
 
       - name: Run Semantic Release
         working-directory: ./dist
-        run: npx semantic-release
+        run: npx semantic-release@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
