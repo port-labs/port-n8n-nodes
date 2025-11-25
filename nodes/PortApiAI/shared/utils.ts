@@ -2,7 +2,9 @@ import {
 	IDataObject,
 	IExecuteFunctions,
 	NodeApiError,
+	NodeOperationError,
 	type INodePropertyOptions,
+	type INode,
 } from 'n8n-workflow';
 
 /**
@@ -128,11 +130,18 @@ export function normalizeBaseUrl(baseUrl: string): string {
 }
 
 /**
- * Parse JSON parameter safely, returning null if invalid or empty
+ * Parse JSON parameter safely, returning null if empty or throwing error if invalid
  * @param jsonString The JSON string to parse
- * @returns Parsed object or null if invalid/empty
+ * @param node The node instance (for error handling)
+ * @param fieldName The name of the field being parsed (for error messages)
+ * @returns Parsed object or null if empty
+ * @throws NodeOperationError if JSON is invalid
  */
-export function parseJsonParameter(jsonString: string): IDataObject | null {
+export function parseJsonParameter(
+	jsonString: string,
+	node?: INode,
+	fieldName?: string,
+): IDataObject | null {
 	if (!jsonString || !jsonString.trim() || jsonString === '{}') {
 		return null;
 	}
@@ -142,7 +151,14 @@ export function parseJsonParameter(jsonString: string): IDataObject | null {
 			return parsed;
 		}
 		return null;
-	} catch {
+	} catch (error) {
+		if (node) {
+			const field = fieldName ? ` for field "${fieldName}"` : '';
+			throw new NodeOperationError(
+				node,
+				`Invalid JSON${field}: ${error instanceof Error ? error.message : String(error)}`,
+			);
+		}
 		return null;
 	}
 }

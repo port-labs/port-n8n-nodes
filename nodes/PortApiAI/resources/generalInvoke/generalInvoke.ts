@@ -149,6 +149,8 @@ export async function executeGeneralInvoke(
 	// Parse optional JSON parameters
 	const labels = parseJsonParameter(
 		this.getNodeParameter('generalLabels', itemIndex, '{}') as string,
+		this.getNode(),
+		'labels',
 	);
 	if (labels) {
 		payload.labels = labels;

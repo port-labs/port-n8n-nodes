@@ -131,6 +131,8 @@ export async function executeInvokeAgent(
 	// Parse optional JSON parameters
 	const context = parseJsonParameter(
 		this.getNodeParameter('context', itemIndex, '{}') as string,
+		this.getNode(),
+		'context',
 	);
 	if (context) {
 		payload.context = context;
@@ -141,6 +143,8 @@ export async function executeInvokeAgent(
 
 	const labels = parseJsonParameter(
 		this.getNodeParameter('labels', itemIndex, '{}') as string,
+		this.getNode(),
+		'labels',
 	);
 	if (labels) {
 		payload.labels = labels;
