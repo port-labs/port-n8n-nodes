@@ -154,17 +154,18 @@ export function parseJsonParameter(jsonString: string): IDataObject | null {
  */
 export function buildQueryString(params: Record<string, string | boolean>): string {
 	const queryParams: string[] = [];
+
 	for (const [key, value] of Object.entries(params)) {
 		if (typeof value === 'boolean') {
-			if (value) {
-				queryParams.push(`${key}=true`);
-			}
-		} else if (value) {
+			queryParams.push(`${key}=${value}`);
+		} else if (value !== undefined && value !== null && value !== '') {
 			queryParams.push(`${key}=${encodeURIComponent(value)}`);
 		}
 	}
+
 	return queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
 }
+
 
 /**
  * Extract response text from HTTP response body
