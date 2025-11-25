@@ -37,22 +37,33 @@ if (!pkg.name.startsWith('n8n-nodes-')) {
 	pkg.name = 'n8n-nodes-port-api-ai';
 }
 
-// Remove dev scripts that aren't needed in published package
-delete pkg.scripts?.build;
-delete pkg.scripts?.['build:watch'];
-delete pkg.scripts?.dev;
-delete pkg.scripts?.lint;
-delete pkg.scripts?.['lint:fix'];
-delete pkg.scripts?.release;
-delete pkg.scripts?.prepublishOnly;
+delete pkg.scripts;
 
 // Remove devDependencies as they're not needed in published package
 delete pkg.devDependencies;
 
 fs.writeFileSync(distPackageJsonPath, JSON.stringify(pkg, null, 2) + '\n');
 
+// Copy README.md and LICENSE to dist folder
+const distDir = path.dirname(distPackageJsonPath);
+const rootDir = fs.existsSync(path.join(__dirname, '..', 'dist', 'package.json'))
+	? path.join(__dirname, '..') // Running from root/scripts
+	: path.join(__dirname, '..', '..'); // Running from dist/scripts
+
+const filesToCopy = ['README.md', 'LICENSE'];
+for (const file of filesToCopy) {
+	const src = path.join(rootDir, file);
+	const dest = path.join(distDir, file);
+	if (fs.existsSync(src)) {
+		fs.copyFileSync(src, dest);
+		console.log(`✓ Copied ${file} to dist folder`);
+	} else {
+		console.warn(`⚠ ${file} not found at project root`);
+	}
+}
+
 console.log(`✓ Prepared ${path.basename(distPackageJsonPath)} for NPM publishing`);
 console.log('  - Removed dist/ prefixes from n8n paths');
 console.log('  - Removed files field');
-console.log('  - Removed dev scripts and devDependencies');
+console.log('  - Removed scripts and devDependencies');
 

@@ -51,34 +51,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      - name: Pre-create dist directory
-        run: mkdir -p dist
-
       - name: Install dependencies
-        working-directory: ./dist
-        run: |
-          if [ -f "pnpm-lock.yaml" ]; then
-            pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
-          else
-            pnpm install
-          fi
+        run: pnpm install --frozen-lockfile
 
       - name: Build project
-        working-directory: ./dist
         run: pnpm run build
+
+      - name: Prepare dist for publishing
+        run: pnpm run prerelease
 
       - name: Upgrade npm (needs >= 11.5.1)
         run: npm i -g npm@latest
-
-      - name: Verify npm OIDC configuration
-        working-directory: ./dist
-        run: |
-          echo "Checking npm registry configuration..."
-          npm config get registry
-          echo "Checking for .npmrc file..."
-          cat ~/.npmrc 2>/dev/null || echo "ERROR: No .npmrc found"
-          echo "Verifying npm can access registry..."
-          npm ping --registry=https://registry.npmjs.org || echo "ERROR: Ping to registry failed, will attempt to deploy anyway."
 
       - name: Run Semantic Release
         working-directory: ./dist

@@ -24,7 +24,7 @@
 		"dev": "N8N_PORT=5680 N8N_SECURE_COOKIE=false n8n-node dev",
 		"lint": "n8n-node lint",
 		"lint:fix": "n8n-node lint --fix",
-		"prerelease": "node ../scripts/pre-release.js"
+		"prerelease": "node ./scripts/pre-release.js"
 	},
 	"files": [
 		"dist"
