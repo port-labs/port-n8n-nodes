@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-port-api-ai",
-	"version": "0.0.1-alpha.0",
+	"version": "1.0.0-alpha.2",
 	"description": "EXPERIMENTAL: n8n nodes for Port.io",
 	"license": "MIT",
 	"homepage": "https://www.port.io/",
