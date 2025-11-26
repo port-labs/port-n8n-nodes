@@ -177,7 +177,7 @@ console.log(res.data);
 | Field | Value |
 |---|---|
 | **Package name** | `@port-labs/n8n-nodes-portio-experimental` |
-| **Version** | `1.0.0-alpha.2` (experimental release) |
+| **Version** | `1.0.0-alpha.4` (experimental release) |
 | **Node type** | Custom n8n nodes |
 | **Focus** | Port AI integrations |
 | **Status** | Experimental / early access |

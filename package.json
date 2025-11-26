@@ -1,6 +1,6 @@
 {
 	"name": "@port-labs/n8n-nodes-portio-experimental",
-	"version": "1.0.0-alpha.3",
+	"version": "1.0.0-alpha.4",
 	"description": "EXPERIMENTAL: n8n nodes for Port.io",
 	"license": "MIT",
 	"homepage": "https://www.port.io/",
@@ -12,7 +12,8 @@
 		"agent"
 	],
 	"author": {
-		"name": "Port"
+		"name": "Port.io",
+		"email": "nathanr@port.io"
 	},
 	"repository": {
 		"type": "git",
