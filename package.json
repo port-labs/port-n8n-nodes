@@ -1,5 +1,5 @@
 {
-	"name": "n8n-nodes-port-api-ai",
+	"name": "@port-labs/n8n-nodes-portio-experimental",
 	"version": "1.0.0-alpha.2",
 	"description": "EXPERIMENTAL: n8n nodes for Port.io",
 	"license": "MIT",
