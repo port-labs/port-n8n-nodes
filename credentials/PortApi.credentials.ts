@@ -1,9 +1,19 @@
-import { ICredentialType, INodeProperties } from 'n8n-workflow';
+import type {
+	Icon,
+	ICredentialTestRequest,
+	ICredentialType,
+	INodeProperties,
+} from 'n8n-workflow';
 
-export class PortIoApi implements ICredentialType {
-	name = 'portIoApi';
-	displayName = 'Port.io API';
+export class PortApi implements ICredentialType {
+	name = 'portApi';
+
+	displayName = 'Port API';
+
+	icon: Icon = { light: 'file:../icons/port.svg', dark: 'file:../icons/port.dark.svg' };
+
 	documentationUrl = 'https://docs.port.io/api-reference/';
+
 	properties: INodeProperties[] = [
 		{
 			displayName: 'Client ID',
@@ -31,4 +41,16 @@ export class PortIoApi implements ICredentialType {
 				'API base without version. The node appends /v1 to routes. EU: https://api.getport.io, US: https://api.us.getport.io',
 		},
 	];
+
+	test: ICredentialTestRequest = {
+		request: {
+			baseURL: '={{ $credentials.baseUrl || "https://api.getport.io" }}',
+			url: '/v1/auth/access_token',
+			method: 'POST',
+			body: {
+				clientId: '={{ $credentials.clientId }}',
+				clientSecret: '={{ $credentials.clientSecret }}',
+			},
+		},
+	};
 }
