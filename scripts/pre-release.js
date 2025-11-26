@@ -44,22 +44,77 @@ delete pkg.devDependencies;
 
 fs.writeFileSync(distPackageJsonPath, JSON.stringify(pkg, null, 2) + '\n');
 
-// Copy README.md and LICENSE to dist folder
+// Copy README.md, LICENSE, and docs folder to dist folder
 const distDir = path.dirname(distPackageJsonPath);
 const rootDir = fs.existsSync(path.join(__dirname, '..', 'dist', 'package.json'))
 	? path.join(__dirname, '..') // Running from root/scripts
 	: path.join(__dirname, '..', '..'); // Running from dist/scripts
+
+// Function to remove GitHub-specific markdown syntax
+function removeGitHubMarkdown(content) {
+	// Remove GitHub callout syntax like [!NOTE], [!WARNING], [!TIP], etc.
+	// Pattern matches: > [!NOTE] or >[!NOTE] followed by optional spaces and newline
+	content = content.replace(/^>\s*\[!([A-Z]+)\]\s*$/gm, (match, calloutType) => {
+		// Convert callout type to a readable format
+		const calloutMap = {
+			NOTE: '**Note:**',
+			WARNING: '**Warning:**',
+			TIP: '**Tip:**',
+			IMPORTANT: '**Important:**',
+			CAUTION: '**Caution:**',
+		};
+		return `> ${calloutMap[calloutType] || `**${calloutType}:**`}`;
+	});
+	return content;
+}
 
 const filesToCopy = ['README.md', 'LICENSE'];
 for (const file of filesToCopy) {
 	const src = path.join(rootDir, file);
 	const dest = path.join(distDir, file);
 	if (fs.existsSync(src)) {
-		fs.copyFileSync(src, dest);
-		console.log(`✓ Copied ${file} to dist folder`);
+		if (file === 'README.md') {
+			// Process README.md to remove GitHub-specific markdown
+			const content = fs.readFileSync(src, 'utf8');
+			const processedContent = removeGitHubMarkdown(content);
+			fs.writeFileSync(dest, processedContent, 'utf8');
+			console.log(`✓ Copied and processed ${file} to dist folder`);
+		} else {
+			fs.copyFileSync(src, dest);
+			console.log(`✓ Copied ${file} to dist folder`);
+		}
 	} else {
 		console.warn(`⚠ ${file} not found at project root`);
 	}
+}
+
+// Copy docs folder recursively
+function copyRecursiveSync(src, dest) {
+	const exists = fs.existsSync(src);
+	const stats = exists && fs.statSync(src);
+	const isDirectory = exists && stats.isDirectory();
+	if (isDirectory) {
+		if (!fs.existsSync(dest)) {
+			fs.mkdirSync(dest, { recursive: true });
+		}
+		fs.readdirSync(src).forEach((childItemName) => {
+			copyRecursiveSync(
+				path.join(src, childItemName),
+				path.join(dest, childItemName)
+			);
+		});
+	} else {
+		fs.copyFileSync(src, dest);
+	}
+}
+
+const docsSrc = path.join(rootDir, 'docs');
+const docsDest = path.join(distDir, 'docs');
+if (fs.existsSync(docsSrc)) {
+	copyRecursiveSync(docsSrc, docsDest);
+	console.log(`✓ Copied docs folder to dist folder`);
+} else {
+	console.warn(`⚠ docs folder not found at project root`);
 }
 
 console.log(`✓ Prepared ${path.basename(distPackageJsonPath)} for NPM publishing`);
