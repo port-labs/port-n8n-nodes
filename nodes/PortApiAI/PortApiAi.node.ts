@@ -54,7 +54,7 @@ export class PortApiAi implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Port API AI',
 		name: 'portApiAi',
-		icon: { light: 'file:../../icons/port.svg', dark: 'file:../../icons/port.dark.svg' },
+		icon: { light: 'file:../icons/port.svg', dark: 'file:../icons/port.dark.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{ $parameter["operation"] }}',

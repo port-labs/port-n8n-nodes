@@ -117,6 +117,32 @@ if (fs.existsSync(docsSrc)) {
 	console.warn(`⚠ docs folder not found at project root`);
 }
 
+// Remove .map files (source maps) and build artifacts from dist folder
+function removeBuildArtifacts(dir) {
+	if (!fs.existsSync(dir)) {
+		return;
+	}
+	const entries = fs.readdirSync(dir, { withFileTypes: true });
+	for (const entry of entries) {
+		const fullPath = path.join(dir, entry.name);
+		if (entry.isDirectory()) {
+			removeBuildArtifacts(fullPath);
+		} else if (entry.isFile()) {
+			// Remove source map files
+			if (entry.name.endsWith('.map')) {
+				fs.unlinkSync(fullPath);
+			}
+			// Remove TypeScript build info file
+			if (entry.name === 'tsconfig.tsbuildinfo') {
+				fs.unlinkSync(fullPath);
+			}
+		}
+	}
+}
+
+removeBuildArtifacts(distDir);
+console.log(`✓ Removed .map files and build artifacts from dist folder`);
+
 console.log(`✓ Prepared ${path.basename(distPackageJsonPath)} for NPM publishing`);
 console.log('  - Removed dist/ prefixes from n8n paths');
 console.log('  - Removed files field');
