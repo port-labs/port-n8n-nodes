@@ -33,7 +33,7 @@ if (pkg.n8n) {
 delete pkg.files;
 
 // Ensure package name starts with n8n-nodes- for NPM publishing
-if (!pkg.name.startsWith('n8n-nodes-')) {
+if (!pkg.name.startsWith('n8n-nodes-') && !pkg.name.startsWith('@port-labs')) {
 	pkg.name = 'n8n-nodes-port-api-ai';
 }
 
