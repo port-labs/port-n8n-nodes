@@ -17,6 +17,7 @@ export const invokeAgentOperation = {
 };
 
 const showOnlyForInvokeAgent = {
+	resource: ['agent'],
 	operation: ['invokeAgent'],
 };
 
@@ -33,16 +34,6 @@ export const invokeAgentDescription: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Context',
-		name: 'context',
-		type: 'json',
-		default: '{}',
-		description: 'Optional context object',
-		displayOptions: {
-			show: showOnlyForInvokeAgent,
-		},
-	},
-	{
 		displayName: 'Prompt',
 		name: 'prompt',
 		type: 'string',
@@ -54,66 +45,67 @@ export const invokeAgentDescription: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Labels',
-		name: 'labels',
-		type: 'json',
-		default: '{}',
-		description: 'Optional labels object',
+		displayName: 'Additional Fields',
+		name: 'additionalFields',
+		type: 'collection',
+		placeholder: 'Add Field',
+		default: {},
 		displayOptions: {
 			show: showOnlyForInvokeAgent,
 		},
-	},
-	{
-		displayName: 'Provider',
-		name: 'provider',
-		type: 'options',
-		default: 'port',
-		description: 'Optional provider',
-		displayOptions: {
-			show: showOnlyForInvokeAgent,
-		},
-		options: PROVIDER_OPTIONS,
-	},
-	{
-		displayName: 'Model',
-		name: 'model',
-		type: 'options',
-		default: 'gpt-5',
-		description: 'Model selection',
-		displayOptions: {
-			show: showOnlyForInvokeAgent,
-		},
-		options: MODEL_OPTIONS,
-	},
-	{
-		displayName: 'Invocation Identifier',
-		name: 'invocation_identifier',
-		type: 'string',
-		default: '',
-		description: 'Optional invocation identifier',
-		displayOptions: {
-			show: showOnlyForInvokeAgent,
-		},
-	},
-	{
-		displayName: 'Stream',
-		name: 'stream',
-		type: 'boolean',
-		default: false,
-		description: 'Whether to stream the response',
-		displayOptions: {
-			show: showOnlyForInvokeAgent,
-		},
-	},
-	{
-		displayName: 'Use MCP',
-		name: 'use_mcp',
-		type: 'boolean',
-		default: false,
-		description: 'Whether to use MCP',
-		displayOptions: {
-			show: showOnlyForInvokeAgent,
-		},
+		options: [
+			{
+				displayName: 'Context',
+				name: 'context',
+				type: 'json',
+				default: '{}',
+				description: 'Optional context object',
+			},
+			{
+				displayName: 'Invocation Identifier',
+				name: 'invocation_identifier',
+				type: 'string',
+				default: '',
+				description: 'Optional invocation identifier',
+			},
+			{
+				displayName: 'Labels',
+				name: 'labels',
+				type: 'json',
+				default: '{}',
+				description: 'Optional labels object',
+			},
+			{
+				displayName: 'Model',
+				name: 'model',
+				type: 'options',
+				default: 'gpt-5',
+				description: 'Model selection',
+				options: MODEL_OPTIONS,
+			},
+			{
+				displayName: 'Provider',
+				name: 'provider',
+				type: 'options',
+				default: 'port',
+				description: 'Optional provider',
+				options: PROVIDER_OPTIONS,
+			},
+			{
+				displayName: 'Stream',
+				name: 'stream',
+				type: 'boolean',
+				default: false,
+				description: 'Whether to stream the response',
+			},
+			{
+				displayName: 'Use MCP',
+				name: 'use_mcp',
+				type: 'boolean',
+				default: false,
+				description: 'Whether to use MCP',
+			},
+		],
 	},
 ];
 
@@ -124,48 +116,57 @@ export async function executeInvokeAgent(
 	accessToken: string,
 ): Promise<IDataObject> {
 	const agentIdentifier = this.getNodeParameter('agentIdentifier', itemIndex) as string;
+	const prompt = this.getNodeParameter('prompt', itemIndex) as string;
+	const additionalFields = this.getNodeParameter('additionalFields', itemIndex, {}) as IDataObject;
 
 	// Build payload from structured fields
-	const payload: IDataObject = {};
+	const payload: IDataObject = {
+		prompt,
+	};
 
-	// Parse optional JSON parameters
-	const context = parseJsonParameter(
-		this.getNodeParameter('context', itemIndex, '{}') as string,
-		this.getNode(),
-		'context',
-	);
-	if (context) {
-		payload.context = context;
+	// Parse optional JSON parameters from additionalFields
+	if (additionalFields.context) {
+		const context = parseJsonParameter(
+			additionalFields.context as string,
+			this.getNode(),
+			'context',
+		);
+		if (context) {
+			payload.context = context;
+		}
 	}
 
-	const prompt = this.getNodeParameter('prompt', itemIndex) as string;
-	payload.prompt = prompt;
-
-	const labels = parseJsonParameter(
-		this.getNodeParameter('labels', itemIndex, '{}') as string,
-		this.getNode(),
-		'labels',
-	);
-	if (labels) {
-		payload.labels = labels;
+	if (additionalFields.labels) {
+		const labels = parseJsonParameter(
+			additionalFields.labels as string,
+			this.getNode(),
+			'labels',
+		);
+		if (labels) {
+			payload.labels = labels;
+		}
 	}
 
-	const provider = this.getNodeParameter('provider', itemIndex, '') as string;
-	if (provider) {
-		payload.provider = provider;
+	if (additionalFields.provider) {
+		payload.provider = additionalFields.provider as string;
 	}
 
-	const model = this.getNodeParameter('model', itemIndex, '') as string;
-	if (model) {
-		payload.model = model;
+	if (additionalFields.model) {
+		payload.model = additionalFields.model as string;
 	}
 
-	// Build query parameters
-	const queryString = buildQueryString({
-		invocation_identifier: this.getNodeParameter('invocation_identifier', itemIndex, '') as string,
-		stream: this.getNodeParameter('stream', itemIndex, false) as boolean,
-		use_mcp: this.getNodeParameter('use_mcp', itemIndex, false) as boolean,
-	});
+	// Build query parameters from additionalFields
+	const queryParams: Record<string, string | boolean> = {};
+	if (additionalFields.invocation_identifier) {
+		queryParams.invocation_identifier = additionalFields.invocation_identifier as string;
+	}
+	if (typeof additionalFields.stream === 'boolean') {
+		queryParams.stream = additionalFields.stream;
+	}
+	if (typeof additionalFields.use_mcp === 'boolean') {
+		queryParams.use_mcp = additionalFields.use_mcp;
+	}
+	const queryString = buildQueryString(queryParams);
 
 	const url = `${baseUrl}/v1/agent/${encodeURIComponent(agentIdentifier)}/invoke${queryString}`;
 

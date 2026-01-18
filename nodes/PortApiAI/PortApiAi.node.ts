@@ -8,30 +8,18 @@ import {
 	type INodeTypeDescription,
 } from 'n8n-workflow';
 import {
-	invokeAgentOperation,
 	invokeAgentDescription,
 	executeInvokeAgent,
 } from './resources/invokeAgent/invokeAgent';
 import {
-	generalInvokeOperation,
 	generalInvokeDescription,
 	executeGeneralInvoke,
 } from './resources/generalInvoke/generalInvoke';
 import {
-	getInvocationOperation,
 	getInvocationDescription,
 	executeGetInvocation,
 } from './resources/getInvocation/getInvocation';
 import { getAccessToken, normalizeBaseUrl } from './shared/utils';
-
-/**
- * Available operations for the Port API AI node
- */
-const operations = [
-	invokeAgentOperation,
-	generalInvokeOperation,
-	getInvocationOperation,
-];
 
 /**
  * Map of operation values to their execution functions
@@ -57,7 +45,7 @@ export class PortApiAi implements INodeType {
 		icon: { light: 'file:../../icons/port.svg', dark: 'file:../../icons/port.dark.svg' },
 		group: ['transform'],
 		version: 1,
-		subtitle: '={{ $parameter["operation"] }}',
+		subtitle: '={{$parameter["resource"] + ": " + $parameter["operation"]}}',
 		description:
 			'Invoke Port AI agents, call general AI interactions, and fetch invocation results',
 		defaults: {
@@ -69,17 +57,69 @@ export class PortApiAi implements INodeType {
 		credentials: [{ name: 'portApi', required: true }],
 		properties: [
 			{
+				displayName: 'Resource',
+				name: 'resource',
+				type: 'options',
+				noDataExpression: true,
+				options: [
+					{
+						name: 'Agent',
+						value: 'agent',
+						description: 'Interact with Port AI agents',
+					},
+					{
+						name: 'AI Interaction',
+						value: 'aiInteraction',
+						description: 'General-purpose AI interactions and invocation results',
+					},
+				],
+				default: 'agent',
+			},
+			{
 				displayName: 'Operation',
 				name: 'operation',
 				type: 'options',
 				noDataExpression: true,
-				options: operations.map((op) => ({
-					name: op.name,
-					value: op.value,
-					description: op.description,
-					action: op.action,
-				})),
-				default: '',
+				displayOptions: {
+					show: {
+						resource: ['agent'],
+					},
+				},
+				options: [
+					{
+						name: 'Invoke',
+						value: 'invokeAgent',
+						description: 'Invoke a specific agent',
+						action: 'Invoke an agent',
+					},
+				],
+				default: 'invokeAgent',
+			},
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				displayOptions: {
+					show: {
+						resource: ['aiInteraction'],
+					},
+				},
+				options: [
+					{
+						name: 'Invoke',
+						value: 'generalInvoke',
+						description: 'General-purpose AI interaction',
+						action: 'Invoke AI interaction',
+					},
+					{
+						name: 'Get Result',
+						value: 'getInvocation',
+						description: 'Get invocation result',
+						action: 'Get invocation result',
+					},
+				],
+				default: 'generalInvoke',
 			},
 			...invokeAgentDescription,
 			...generalInvokeDescription,

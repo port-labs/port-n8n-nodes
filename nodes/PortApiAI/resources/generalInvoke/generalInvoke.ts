@@ -17,6 +17,7 @@ export const generalInvokeOperation = {
 };
 
 const showOnlyForGeneralInvoke = {
+	resource: ['aiInteraction'],
 	operation: ['generalInvoke'],
 };
 
@@ -44,70 +45,64 @@ export const generalInvokeDescription: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Labels',
-		name: 'generalLabels',
-		type: 'json',
-		default: '{}',
-		description: 'Optional labels object',
+		displayName: 'Additional Fields',
+		name: 'additionalFields',
+		type: 'collection',
+		placeholder: 'Add Field',
+		default: {},
 		displayOptions: {
 			show: showOnlyForGeneralInvoke,
 		},
-	},
-	{
-		displayName: 'Provider',
-		name: 'generalProvider',
-		type: 'options',
-		default: 'openai',
-		description: 'Optional provider',
-		displayOptions: {
-			show: showOnlyForGeneralInvoke,
-		},
-		options: PROVIDER_OPTIONS,
-	},
-	{
-		displayName: 'Model',
-		name: 'generalModel',
-		type: 'options',
-		default: 'claude-sonnet-4-20250514',
-		description: 'Optional model',
-		displayOptions: {
-			show: showOnlyForGeneralInvoke,
-		},
-		options: MODEL_OPTIONS,
-	},
-	{
-		displayName: 'System Prompt',
-		name: 'systemPrompt',
-		type: 'string',
-		default: '',
-		description: 'Optional system prompt',
-		displayOptions: {
-			show: showOnlyForGeneralInvoke,
-		},
-	},
-	{
-		displayName: 'Execution Mode',
-		name: 'executionMode',
-		type: 'options',
-		default: 'Approval Required',
 		options: [
-			{ name: 'Automatic', value: 'Automatic' },
-			{ name: 'Approval Required', value: 'Approval Required' },
+			{
+				displayName: 'Execution Mode',
+				name: 'executionMode',
+				type: 'options',
+				default: 'Approval Required',
+				options: [
+					{ name: 'Automatic', value: 'Automatic' },
+					{ name: 'Approval Required', value: 'Approval Required' },
+				],
+				description: 'Optional execution mode',
+			},
+			{
+				displayName: 'Invocation Identifier',
+				name: 'invocation_identifier',
+				type: 'string',
+				default: '',
+				description: 'Optional invocation identifier',
+			},
+			{
+				displayName: 'Labels',
+				name: 'labels',
+				type: 'json',
+				default: '{}',
+				description: 'Optional labels object',
+			},
+			{
+				displayName: 'Model',
+				name: 'model',
+				type: 'options',
+				default: 'claude-sonnet-4-20250514',
+				description: 'Optional model',
+				options: MODEL_OPTIONS,
+			},
+			{
+				displayName: 'Provider',
+				name: 'provider',
+				type: 'options',
+				default: 'openai',
+				description: 'Optional provider',
+				options: PROVIDER_OPTIONS,
+			},
+			{
+				displayName: 'System Prompt',
+				name: 'systemPrompt',
+				type: 'string',
+				default: '',
+				description: 'Optional system prompt',
+			},
 		],
-		description: 'Optional execution mode',
-		displayOptions: {
-			show: showOnlyForGeneralInvoke,
-		},
-	},
-	{
-		displayName: 'Invocation Identifier',
-		name: 'invocation_identifier',
-		type: 'string',
-		default: '',
-		description: 'Optional invocation identifier',
-		displayOptions: {
-			show: showOnlyForGeneralInvoke,
-		},
 	},
 ];
 
@@ -117,14 +112,16 @@ export async function executeGeneralInvoke(
 	baseUrl: string,
 	accessToken: string,
 ): Promise<IDataObject> {
-	// Build payload from structured fields
-	const payload: IDataObject = {};
-
 	const userPrompt = this.getNodeParameter('userPrompt', itemIndex) as string;
-	payload.userPrompt = userPrompt;
+	const toolsParam = this.getNodeParameter('tools', itemIndex) as string;
+	const additionalFields = this.getNodeParameter('additionalFields', itemIndex, {}) as IDataObject;
+
+	// Build payload from structured fields
+	const payload: IDataObject = {
+		userPrompt,
+	};
 
 	// Parse tools JSON array (required)
-	const toolsParam = this.getNodeParameter('tools', itemIndex) as string;
 	try {
 		const parsed = JSON.parse(toolsParam);
 		if (!Array.isArray(parsed)) {
@@ -146,40 +143,40 @@ export async function executeGeneralInvoke(
 		});
 	}
 
-	// Parse optional JSON parameters
-	const labels = parseJsonParameter(
-		this.getNodeParameter('generalLabels', itemIndex, '{}') as string,
-		this.getNode(),
-		'labels',
-	);
-	if (labels) {
-		payload.labels = labels;
+	// Parse optional JSON parameters from additionalFields
+	if (additionalFields.labels) {
+		const labels = parseJsonParameter(
+			additionalFields.labels as string,
+			this.getNode(),
+			'labels',
+		);
+		if (labels) {
+			payload.labels = labels;
+		}
 	}
 
-	const provider = this.getNodeParameter('generalProvider', itemIndex, '') as string;
-	if (provider) {
-		payload.provider = provider;
+	if (additionalFields.provider) {
+		payload.provider = additionalFields.provider as string;
 	}
 
-	const model = this.getNodeParameter('generalModel', itemIndex, '') as string;
-	if (model) {
-		payload.model = model;
+	if (additionalFields.model) {
+		payload.model = additionalFields.model as string;
 	}
 
-	const systemPrompt = this.getNodeParameter('systemPrompt', itemIndex, '') as string;
-	if (systemPrompt) {
-		payload.systemPrompt = systemPrompt;
+	if (additionalFields.systemPrompt) {
+		payload.systemPrompt = additionalFields.systemPrompt as string;
 	}
 
-	const executionMode = this.getNodeParameter('executionMode', itemIndex, '') as string;
-	if (executionMode) {
-		payload.executionMode = executionMode;
+	if (additionalFields.executionMode) {
+		payload.executionMode = additionalFields.executionMode as string;
 	}
 
-	// Build query parameters
-	const queryString = buildQueryString({
-		invocation_identifier: this.getNodeParameter('invocation_identifier', itemIndex, '') as string,
-	});
+	// Build query parameters from additionalFields
+	const queryParams: Record<string, string | boolean> = {};
+	if (additionalFields.invocation_identifier) {
+		queryParams.invocation_identifier = additionalFields.invocation_identifier as string;
+	}
+	const queryString = buildQueryString(queryParams);
 
 	const url = `${baseUrl}/v1/ai/invoke${queryString}`;
 
