@@ -9,6 +9,7 @@ export const getInvocationOperation = {
 };
 
 const showOnlyForGetInvocation = {
+	resource: ['aiInteraction'],
 	operation: ['getInvocation'],
 };
 
