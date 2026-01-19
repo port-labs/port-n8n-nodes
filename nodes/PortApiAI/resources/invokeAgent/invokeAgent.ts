@@ -113,7 +113,6 @@ export async function executeInvokeAgent(
 	this: IExecuteFunctions,
 	itemIndex: number,
 	baseUrl: string,
-	accessToken: string,
 ): Promise<IDataObject> {
 	const agentIdentifier = this.getNodeParameter('agentIdentifier', itemIndex) as string;
 	const prompt = this.getNodeParameter('prompt', itemIndex) as string;
@@ -172,11 +171,10 @@ export async function executeInvokeAgent(
 
 	try {
 		// The API returns Server-Sent Events (SSE) format, so we need to handle it as text first
-		const rawResponse = (await this.helpers.httpRequest({
+		const rawResponse = (await this.helpers.httpRequestWithAuthentication.call(this, 'portApi', {
 			method: 'POST',
 			url,
 			headers: {
-				Authorization: `Bearer ${accessToken}`,
 				Accept: 'application/json',
 				'Content-Type': 'application/json',
 			},

@@ -19,7 +19,7 @@ import {
 	getInvocationDescription,
 	executeGetInvocation,
 } from './resources/getInvocation/getInvocation';
-import { getAccessToken, normalizeBaseUrl } from './shared/utils';
+import { normalizeBaseUrl } from './shared/utils';
 
 /**
  * Map of operation values to their execution functions
@@ -30,7 +30,6 @@ const operationMap: Record<
 		this: IExecuteFunctions,
 		itemIndex: number,
 		baseUrl: string,
-		accessToken: string,
 	) => Promise<IDataObject>
 > = {
 	invokeAgent: executeInvokeAgent,
@@ -135,24 +134,38 @@ export class PortApiAi implements INodeType {
 		const baseUrl = normalizeBaseUrl(
 			(credentials.baseUrl as string) || 'https://api.getport.io',
 		);
-		const clientId = credentials.clientId as string;
-		const clientSecret = credentials.clientSecret as string;
-
-		const accessToken = await getAccessToken.call(this, baseUrl, clientId, clientSecret);
 
 		for (let i = 0; i < items.length; i++) {
-			const operation = this.getNodeParameter('operation', i) as string;
+			try {
+				const operation = this.getNodeParameter('operation', i) as string;
 
-			const executeFunction = operationMap[operation];
-			if (!executeFunction) {
-				throw new NodeOperationError(this.getNode(), {
-					message: `Unknown operation: ${operation}`,
-					description: `Please select a valid operation. Available operations: ${Object.keys(operationMap).join(', ')}`,
-				});
+				const executeFunction = operationMap[operation];
+				if (!executeFunction) {
+					throw new NodeOperationError(this.getNode(), {
+						message: `Unknown operation: ${operation}`,
+						description: `Please select a valid operation. Available operations: ${Object.keys(operationMap).join(', ')}`,
+					});
+				}
+
+				const responseData = await executeFunction.call(this, i, baseUrl);
+				returnData.push({ json: responseData });
+			} catch (error) {
+				if (this.continueOnFail()) {
+					returnData.push({
+						json: { error: error instanceof Error ? error.message : String(error) },
+						pairedItem: { item: i },
+					});
+					continue;
+				}
+
+				throw new NodeOperationError(
+					this.getNode(),
+					error as Error,
+					{
+						itemIndex: i,
+					}
+				);
 			}
-
-			const responseData = await executeFunction.call(this, i, baseUrl, accessToken);
-			returnData.push({ json: responseData });
 		}
 
 		return [returnData];

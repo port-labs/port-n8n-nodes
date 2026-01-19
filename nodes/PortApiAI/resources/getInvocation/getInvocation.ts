@@ -31,16 +31,14 @@ export async function executeGetInvocation(
 	this: IExecuteFunctions,
 	itemIndex: number,
 	baseUrl: string,
-	accessToken: string,
 ): Promise<IDataObject> {
 	const invocationIdentifier = this.getNodeParameter('invocation_identifier', itemIndex) as string;
 
 	try {
-		return (await this.helpers.httpRequest({
+		return (await this.helpers.httpRequestWithAuthentication.call(this, 'portApi', {
 			method: 'GET',
 			url: `${baseUrl}/v1/ai/invoke/${encodeURIComponent(invocationIdentifier)}`,
 			headers: {
-				Authorization: `Bearer ${accessToken}`,
 				Accept: 'application/json',
 			},
 			json: true,

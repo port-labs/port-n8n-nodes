@@ -110,7 +110,6 @@ export async function executeGeneralInvoke(
 	this: IExecuteFunctions,
 	itemIndex: number,
 	baseUrl: string,
-	accessToken: string,
 ): Promise<IDataObject> {
 	const userPrompt = this.getNodeParameter('userPrompt', itemIndex) as string;
 	const toolsParam = this.getNodeParameter('tools', itemIndex) as string;
@@ -182,11 +181,10 @@ export async function executeGeneralInvoke(
 
 	try {
 		// The API returns Server-Sent Events (SSE) format, so we need to handle it as text first
-		const rawResponse = (await this.helpers.httpRequest({
+		const rawResponse = (await this.helpers.httpRequestWithAuthentication.call(this, 'portApi', {
 			method: 'POST',
 			url,
 			headers: {
-				Authorization: `Bearer ${accessToken}`,
 				Accept: 'application/json',
 				'Content-Type': 'application/json',
 			},
