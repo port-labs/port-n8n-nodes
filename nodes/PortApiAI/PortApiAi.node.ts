@@ -96,18 +96,36 @@ export class PortApiAi implements INodeType {
 		);
 
 		for (let i = 0; i < items.length; i++) {
-			const operation = this.getNodeParameter('operation', i) as string;
+			try {
+				const operation = this.getNodeParameter('operation', i) as string;
 
-			const executeFunction = operationMap[operation];
-			if (!executeFunction) {
-				throw new NodeOperationError(this.getNode(), {
-					message: `Unknown operation: ${operation}`,
-					description: `Please select a valid operation. Available operations: ${Object.keys(operationMap).join(', ')}`,
-				});
+				const executeFunction = operationMap[operation];
+				if (!executeFunction) {
+					throw new NodeOperationError(this.getNode(), {
+						message: `Unknown operation: ${operation}`,
+						description: `Please select a valid operation. Available operations: ${Object.keys(operationMap).join(', ')}`,
+					});
+				}
+
+				const responseData = await executeFunction.call(this, i, baseUrl);
+				returnData.push({ json: responseData });
+			} catch (error) {
+				if (this.continueOnFail()) {
+					returnData.push({
+						json: { error: error instanceof Error ? error.message : String(error) },
+						pairedItem: { item: i },
+					});
+					continue;
+				}
+
+				throw new NodeOperationError(
+					this.getNode(),
+					error as Error,
+					{
+						itemIndex: i,
+					}
+				);
 			}
-
-			const responseData = await executeFunction.call(this, i, baseUrl);
-			returnData.push({ json: responseData });
 		}
 
 		return [returnData];
