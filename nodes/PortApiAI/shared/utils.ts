@@ -1,7 +1,5 @@
 import {
 	IDataObject,
-	IExecuteFunctions,
-	NodeApiError,
 	NodeOperationError,
 	type INodePropertyOptions,
 	type INode,
@@ -203,41 +201,4 @@ export function extractResponseText(
 	return JSON.stringify(body);
 }
 
-export async function getAccessToken(
-	this: IExecuteFunctions,
-	baseUrl: string,
-	clientId: string,
-	clientSecret: string,
-): Promise<string> {
-	const baseUrlCleaned = normalizeBaseUrl(baseUrl);
-	const tokenUrl = `${baseUrlCleaned}/v1/auth/access_token`;
-
-	try {
-		const response = (await this.helpers.httpRequest({
-			method: 'POST',
-			url: tokenUrl,
-			headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-			body: { clientId, clientSecret },
-			json: true,
-		})) as IDataObject;
-
-		// According to Swagger, response has accessToken (camelCase)
-		const accessToken = response.accessToken as string;
-
-		if (!accessToken) {
-			throw new NodeApiError(this.getNode(), {
-				message: `Failed to obtain access token. Response: ${JSON.stringify(response)}`,
-			});
-		}
-
-		return accessToken;
-	} catch (error) {
-		const errorMessage = error instanceof Error ? error.message : String(error);
-		throw new NodeApiError(this.getNode(), {
-			message:
-				`Failed to obtain access token from ${tokenUrl}. Error: ${errorMessage}. ` +
-				`Please verify your base URL (${baseUrl}) and credentials are correct.`,
-		});
-	}
-}
 
